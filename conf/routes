@@ -10,7 +10,6 @@ GET     /count                      controllers.CountController.count
 # An example controller showing how to write asynchronous code
 GET     /message                    controllers.AsyncController.message
 
-
 GET     /simpleForm                 controllers.UploadController.forms
 
 POST    /simpleForm                 controllers.UploadController.simpleFormPost

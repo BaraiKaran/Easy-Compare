@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext
 
 
 class UploadController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with play.api.i18n.I18nSupport {
-  def forms = Action {  implicit request: Request[AnyContent] =>
+  def forms = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.upload(BasicForm.form))
   }
 
