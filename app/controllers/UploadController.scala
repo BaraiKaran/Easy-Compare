@@ -6,6 +6,7 @@ import services.BasicForm
 import services.preprocess
 
 import scala.concurrent.ExecutionContext
+import scala.util.Try
 
 
 class UploadController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with play.api.i18n.I18nSupport {
