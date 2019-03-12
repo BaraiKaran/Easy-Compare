@@ -15,6 +15,11 @@ class PreprocessSpec extends FlatSpec {
     assert(str === Success("HelloThisisaScalatest"))
   }
 
+  "splitText" should "Split the text and return as List" in {
+    val stringToSplit = preprocess.splitText(Try("Hello.Thisisa.ScalaTest"))
+    assert(stringToSplit === Success(List("Hello","Thisisa","ScalaTest")))
+  }
+
 
 
 

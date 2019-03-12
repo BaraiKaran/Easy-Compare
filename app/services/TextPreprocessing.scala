@@ -2,17 +2,18 @@ package services
 
 import java.nio.file.Paths
 
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 object preprocess {
     def apply(filePath: String) : Try[List[String]] = {
-      val filename = filePath
-      val text : Try[List[String]] = Try(scala.io.Source.fromFile(filename, "ISO-8859-1").getLines().map(_.toLowerCase).toList)
+      val text = readTextFile(filePath)
       val textOfDoc = convertListToString(text)
       val textWithoutSpaces = removeWhiteSpaces(textOfDoc)
-      val sentences = Try(textWithoutSpaces.get.split("\\.").toList)
+      val sentences = splitText(textWithoutSpaces)
       sentences
     }
+
+  def readTextFile(filePath : String) = Try(scala.io.Source.fromFile(filePath, "ISO-8859-1").getLines().map(_.toLowerCase).toList)
 
   def removeWhiteSpaces(str: Try[String]) = Try(str.get.replaceAll("\\s",""))
 
@@ -21,6 +22,8 @@ object preprocess {
   def getFileName(filePath: String) : Try[String] = {
     Try(filePath.substring(filePath.lastIndexOf("\\")+1,filePath.length))
   }
+
+  def splitText(txt : Try[String]) = Try(txt.get.split("\\.").toList)
 
   def uploadFile(path: String) = {
   }
