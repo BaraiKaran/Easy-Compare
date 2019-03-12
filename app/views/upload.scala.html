@@ -2,7 +2,6 @@
 @import play.api.i18n.Messages.Implicits._
 @import services.BasicForm
 @(userForm: Form[BasicForm])(implicit messages: Messages)
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 @main("Upload File") {
 
     @helper.form(action =routes.UploadController.simpleFormPost()){
