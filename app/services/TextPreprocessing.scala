@@ -10,7 +10,7 @@ object preprocess {
       val textOfDoc = convertListToString(text)
       val textWithoutSpaces = removeWhiteSpaces(textOfDoc)
       val sentences = splitText(textWithoutSpaces)
-      val hashSentences = Try(ModifiedRabinKarp.hashContentsOfList(sentences))
+      val hashSentences = Try(Comparision.hashContentsOfList(sentences))
       hashSentences
     }
 
