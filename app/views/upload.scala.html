@@ -2,11 +2,10 @@
 @import play.api.i18n.Messages.Implicits._
 @import services.BasicForm
 @(userForm: Form[BasicForm])(implicit messages: Messages)
-
 @main("Upload File") {
-    <h1>Scala Play forms tutorial</h1>
+
     @helper.form(action =routes.UploadController.simpleFormPost()){
-        @inputText(userForm("path"))
+        @inputFile(userForm("path"))
         <input type="submit" value="Submit">
     }
 }
