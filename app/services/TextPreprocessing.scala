@@ -5,12 +5,13 @@ import java.nio.file.Paths
 import scala.util.{Failure, Success, Try}
 
 object preprocess {
-    def apply(filePath: String) : Try[List[String]] = {
+    def apply(filePath: String) : Try[List[Int]] = {
       val text = readTextFile(filePath)
       val textOfDoc = convertListToString(text)
       val textWithoutSpaces = removeWhiteSpaces(textOfDoc)
       val sentences = splitText(textWithoutSpaces)
-      sentences
+      val hashSentences = Try(ModifiedRabinKarp.hashContentsOfList(sentences))
+      hashSentences
     }
 
   def readTextFile(filePath : String) = Try(scala.io.Source.fromFile(filePath, "ISO-8859-1").getLines().map(_.toLowerCase).toList)
