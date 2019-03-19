@@ -1,11 +1,20 @@
 @import helper._
 @import play.api.i18n.Messages.Implicits._
 @import services.BasicForm
-@(userForm: Form[BasicForm])(implicit messages: Messages)
+@(userForm: Form[BasicForm], listOfName : Seq[(String,String)])(implicit messages: Messages)
 @main("Upload File") {
 
-    @helper.form(action =routes.UploadController.simpleFormPost()){
-        @inputFile(userForm("path"))
+    @helper.form(action =routes.UploadController.simpleFormPost(), 'enctype->"multipart/form-data"){
+        @inputFile(userForm("path"), 'multiple -> "multiple", 'name->"path[]")
         <input type="submit" value="Submit">
+
+        @select(field = userForm("abc"), options = listOfName )
     }
+
+
+
+    @helper.form(action = routes.UploadController.compare()) {
+        <input type="submit" value="compare">
+    }
+
 }
