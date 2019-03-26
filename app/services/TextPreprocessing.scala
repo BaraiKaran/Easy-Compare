@@ -7,6 +7,11 @@ import models.InteractionWithDb
 import scala.util.{Failure, Success, Try}
 
 object preprocess {
+
+  /**
+    * this function applies the necessary text pre-processing required for document comparision.
+    * @param filePath absolute path of the file
+    */
     def apply(filePath: String)  = {
         val text = readTextFile(filePath)
         val textOfDoc = convertListToString(text)
@@ -16,17 +21,40 @@ object preprocess {
         InteractionWithDb.insert(hashSentences.get.mkString(","),getFileName(filePath).get)
     }
 
+  /**
+    *
+    * @param filePath path of the file
+    * @return List of String with each line as an element
+    */
+  def readTextFile(filePath : String): Try[List[String]] = Try(scala.io.Source.fromFile(filePath, "ISO-8859-1").getLines().map(_.toLowerCase).toList)
 
-  def readTextFile(filePath : String) = Try(scala.io.Source.fromFile(filePath, "ISO-8859-1").getLines().map(_.toLowerCase).toList)
+  /**
+    *
+    * @param str string from which to remove whitespaces
+    * @return string without any whitespaces
+    */
+  def removeWhiteSpaces(str: Try[String]): Try[String] = Try(str.get.replaceAll("\\s",""))
 
-  def removeWhiteSpaces(str: Try[String]) = Try(str.get.replaceAll("\\s",""))
-
+  /**
+    *
+    * @param list list => string
+    * @return all values of list concatenated as a string
+    */
   def convertListToString(list: Try[List[String]]): Try[String] = list.map(_.mkString("."))
 
+  /**
+    *
+    * @param filePath absolute path of the file
+    * @return name of the file
+    */
   def getFileName(filePath: String) : Try[String] = {
     Try(filePath.substring(filePath.lastIndexOf("\\")+1,filePath.length))
   }
 
+  /**
+    * @param txt string to split
+    * @return List of string after splitting the string by "."
+    */
   def splitText(txt : Try[String]) = Try(txt.get.split("\\.").toList)
 
   def uploadFile(path: String) = {
