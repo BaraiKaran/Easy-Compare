@@ -24,6 +24,11 @@ object InteractionWithDb {
     def * = (id.?, document_name, document_text) <> (document.tupled,document.unapply)
   }
 
+  /**
+    * This function inserts sentences and filename in the database.
+    * @param sentences string of hashes of all the sentences in the document
+    * @param filename name of the file
+    */
   def insert(sentences : String, filename: String) = {
     try {
       Await.result(db.run(DBIO.seq(
@@ -33,13 +38,23 @@ object InteractionWithDb {
     } finally db.close()
   }
 
-  def getfileContents(filename1: String, filename2: String) = {
-    val file1 = db.run(doc.filter(_.document_name === filename1).result).toString().split("\\,").map(_.trim).toList
-    val file2 = db.run(doc.filter(_.document_name === filename2).result).toString().split("\\,").map(_.trim).toList
+  /**
+    *
+    * @param filename1 name of the file 1
+    * @param filename2 name of the file 2
+    * @return tuple of list of string which contains hashed value of each sentence.
+    */
+  def getfileContents(filename1: Option[String], filename2: Option[String]) = {
+    val file1 = Await.result(db.run(doc.filter(_.document_name === filename1).result),Duration.Inf).toString().split("\\,").map(_.trim).toList
+    val file2 = Await.result(db.run(doc.filter(_.document_name === filename2).result),Duration.Inf).toString().split("\\,").map(_.trim).toList
     (file1,file2)
   }
 
+  /**
+    *
+    * @return returns name of all the files uploaded in the database
+    */
   def getUploadedFileNames() = {
-    Await.result(db.run(doc.map(_.document_name).result),Duration.Inf)
+    Await.result(db.run(doc.map(_.document_name).result), Duration.Inf)
   }
 }

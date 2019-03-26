@@ -7,14 +7,12 @@
     @helper.form(action =routes.UploadController.simpleFormPost(), 'enctype->"multipart/form-data"){
         @inputFile(userForm("path"), 'multiple -> "multiple", 'name->"path[]")
         <input type="submit" value="Submit">
-
-        @select(field = userForm("abc"), options = listOfName )
     }
-
-
 
     @helper.form(action = routes.UploadController.compare()) {
+        @select(field = userForm("document1"), options = listOfName)
+        @select(field = userForm("document2"), options = listOfName)
         <input type="submit" value="compare">
     }
-
 }
+

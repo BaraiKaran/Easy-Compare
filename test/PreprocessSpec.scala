@@ -1,6 +1,6 @@
 import org.scalatest._
 import services.preprocess
-import services.Comparision
+import services.Comparison
 
 import scala.util.{Success, Try}
 
@@ -26,8 +26,8 @@ class PreprocessSpec extends FlatSpec {
     val list2 = List(0,2,3,4,5,7,9)
     val list3 = List(1,2,3)
     val list4 = List(3,2,1)
-    assert(Comparision.getSimilarityScore(list1,list2) == 0.33)
-    assert(Comparision.getSimilarityScore(list3,list4) == 1.0)
+    assert(Comparison.getSimilarityScore(list1,list2) == 0.33)
+    assert(Comparison.getSimilarityScore(list3,list4) == 1.0)
   }
 
 }

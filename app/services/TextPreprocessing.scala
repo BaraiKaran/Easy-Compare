@@ -12,7 +12,7 @@ object preprocess {
         val textOfDoc = convertListToString(text)
         val textWithoutSpaces = removeWhiteSpaces(textOfDoc)
         val sentences = splitText(textWithoutSpaces)
-        val hashSentences = Try(Comparision.hashContentsOfList(sentences))
+        val hashSentences = Try(Comparison.hashContentsOfList(sentences))
         InteractionWithDb.insert(hashSentences.get.mkString(","),getFileName(filePath).get)
     }
 
