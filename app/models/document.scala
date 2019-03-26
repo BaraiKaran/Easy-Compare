@@ -17,6 +17,11 @@ object InteractionWithDb {
   val db = Database.forConfig("postgresDb")
   val doc = TableQuery[documents]
 
+  /**
+    * Create a table in Postgresql if the table is not already present.
+    * @param tag
+    */
+
   class documents(tag: Tag) extends Table[document](tag, "tblDocumentInformation") {
     def id = column[Int]("ID", O.PrimaryKey,O.AutoInc)
     def document_name = column[String]("Document_Name")
