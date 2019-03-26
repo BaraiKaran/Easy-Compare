@@ -11,7 +11,8 @@ object BasicForm {
   val form: Form[BasicForm] = Form(
     mapping(
       "path" -> text
-    )(BasicForm.apply)(BasicForm.unapply)
+  )
+    (BasicForm.apply)(BasicForm.unapply)
   )
 }
 
