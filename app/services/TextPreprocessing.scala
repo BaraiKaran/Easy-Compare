@@ -1,7 +1,6 @@
 package services
 
 import java.nio.file.Paths
-
 import models.InteractionWithDb
 
 import scala.util.{Failure, Success, Try}
@@ -13,12 +12,18 @@ object preprocess {
     * @param filePath absolute path of the file
     */
     def apply(filePath: String)  = {
+      if (ValidationService.getFileType(filePath)=="txt") {
         val text = readTextFile(filePath)
         val textOfDoc = convertListToString(text)
         val textWithoutSpaces = removeWhiteSpaces(textOfDoc)
         val sentences = splitText(textWithoutSpaces)
         val hashSentences = Try(Comparison.hashContentsOfList(sentences))
-        InteractionWithDb.insert(hashSentences.get.mkString(","),getFileName(filePath).get)
+        InteractionWithDb.insert(hashSentences.get.mkString(","), getFileName(filePath).get)
+        "File uploaded successfully"
+      }
+      else {
+         "File type should be .txt"
+      }
     }
 
   /**

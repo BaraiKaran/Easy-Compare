@@ -22,8 +22,8 @@ class UploadController @Inject()(cc: ControllerComponents) (implicit system: Act
   def simpleFormPost = Action { implicit request =>
     //val formData: String = BasicForm.form.bindFromRequest.get.path
     val file = request.body.asMultipartFormData.map(_.files)
-    file map { fileseq => fileseq map { file => preprocess.apply(file.filename) } }
-    Ok("File uploaded successfully")
+    val message = file map { fileseq => fileseq map { file => preprocess.apply(file.filename) } }
+    Ok(message.get.head)
   }
   /**
     *
