@@ -6,6 +6,10 @@ import javax.inject.Inject
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.util.Success
+
 class UploadController @Inject()(cc: ControllerComponents) (implicit system: ActorSystem, mat: Materializer) extends AbstractController(cc) with play.api.i18n.I18nSupport {
 
   /**
@@ -29,10 +33,10 @@ class UploadController @Inject()(cc: ControllerComponents) (implicit system: Act
     *
     * @return Comparision score of two documents
     */
-  def compare  = Action { implicit request =>
+  def compare  = Action.async { implicit request =>
     val encoded: Option[Map[String, Seq[String]]] = request.body.asFormUrlEncoded
     val doc1: Option[String] = for (b <- encoded; z <- b.get("document1"); s <- z.headOption ) yield s
     val doc2: Option[String] = for (b <- encoded; z <- b.get("document2"); s <- z.headOption ) yield s
-    Ok(Comparison.getDocument(doc1, doc2).toString)
+    Comparison.getDocument(doc1,doc2).map(i=>Ok(i.toString))
   }
 }

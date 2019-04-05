@@ -2,8 +2,11 @@ package services
 
 import models.InteractionWithDb
 
-import scala.util.Try
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
+import scala.util.{Success, Try}
 import scala.util.hashing.MurmurHash3
+import scala.concurrent.ExecutionContext.Implicits.global
 object Comparison {
 
 
@@ -22,8 +25,8 @@ object Comparison {
     * @return similarity score using Jaccard similarity
     */
 
-  def getSimilarityScore(list1: List[String],list2: List[String]) : Double = {
-    val intersectLength = list1.intersect(list2).length.toDouble
+  def calculateSimilarityScore(list1: List[String],list2: List[String]) : Double = {
+    val intersectLength =  list1.intersect(list2).length.toDouble
     val unionLength = list1.union(list2).toSet.size.toDouble
      "%.2f".format(intersectLength/unionLength).toDouble
   }
@@ -35,8 +38,15 @@ object Comparison {
     * @return similarity score of the two documents
     */
 
-  def getDocument(filename1: Option[String], filename2: Option[String]) : Double = {
-    val filename = InteractionWithDb.getfileContents(filename1,filename2)
-    getSimilarityScore(filename._1,filename._2)
+  def getDocument(filename1: Option[String], filename2: Option[String]) : Future[Double] = {
+    val fname1 = InteractionWithDb.getfileContents(filename1)
+    val fname2 = InteractionWithDb.getfileContents(filename2)
+    getSimilarityScore(fname1,fname2)
   }
+
+  def flattenFuture[T](lst: Future[Option[List[T]]]) : Future[List[T]] = lst.map(x=> getListFromOption(x))
+
+  def getListFromOption[T](to: Option[List[T]]): List[T] = to.toList.flatten
+
+  def getSimilarityScore(list1: Future[Option[List[String]]], list2: Future[Option[List[String]]]) : Future[Double] = for(ws1<-flattenFuture(list1);ws2<-flattenFuture(list2)) yield calculateSimilarityScore(ws1,ws2)
 }

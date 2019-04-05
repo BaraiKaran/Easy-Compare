@@ -5,7 +5,7 @@ import javax.xml.datatype.DatatypeConstants
 import slick.lifted.Tag
 import slick.jdbc.PostgresProfile.api._
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.util.Try
@@ -49,10 +49,28 @@ object InteractionWithDb {
     * @param filename2 name of the file 2
     * @return tuple of list of string which contains hashed value of each sentence.
     */
-  def getfileContents(filename1: Option[String], filename2: Option[String]) = {
-    val file1 = Await.result(db.run(doc.filter(_.document_name === filename1).result),Duration.Inf).toString().split("\\,").map(_.trim).toList
-    val file2 = Await.result(db.run(doc.filter(_.document_name === filename2).result),Duration.Inf).toString().split("\\,").map(_.trim).toList
-    (file1,file2)
+  def sequence[X](xfo: Option[Future[X]]): Future[Option[X]] = xfo match {
+    case Some(xf) => xf map (Some(_))
+    case None => Future.successful(None)
+  }
+
+
+  def getComparison(filename1: Option[String], filename2: Option[String]): Future[Option[(List[String], List[String])]] = {
+    val zipBothFiles = getZipped(filename1, filename2)
+    for ((wso1, wso2) <- zipBothFiles) yield for (ws1 <- wso1; ws2 <- wso2) yield (ws1, ws2)
+  }
+
+  def getfileContents(filename: Option[String]): Future[Option[List[String]]] = {
+    val dsfo: Option[Future[Seq[document]]] = for (f <- filename) yield db.run(doc.filter(_.document_name === f).result)
+    val dsof: Future[Option[Seq[document]]] = sequence(dsfo)
+    for (dso <- dsof) yield for (ds <- dso; d <- ds.headOption) yield d.Document_Text.split("\\,").map(_.trim).toList
+  }
+
+
+  def getZipped(filename1: Option[String], filename2: Option[String]): Future[(Option[List[String]], Option[List[String]])] = {
+    val content1 = getfileContents(filename1)
+    val content2 = getfileContents(filename2)
+    content1 zip content2
   }
 
   /**
