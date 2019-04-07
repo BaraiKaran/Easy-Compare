@@ -6,11 +6,15 @@ import javax.inject.Inject
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 
+import scala.collection.immutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Success
 
 class UploadController @Inject()(cc: ControllerComponents) (implicit system: ActorSystem, mat: Materializer) extends AbstractController(cc) with play.api.i18n.I18nSupport {
+
+
+  def getContentOfOption[T](content: Seq[T]) = content.head
 
   /**
     * GET request to load the form.
@@ -26,8 +30,8 @@ class UploadController @Inject()(cc: ControllerComponents) (implicit system: Act
   def simpleFormPost = Action { implicit request =>
     //val formData: String = BasicForm.form.bindFromRequest.get.path
     val file = request.body.asMultipartFormData.map(_.files)
-    val message = file map { fileseq => fileseq map { file => preprocess.apply(file.filename) } }
-    Ok(message.get.head)
+    val message: Option[Seq[String]] = file map { fileseq => fileseq map { file => preprocess.apply(file.filename) } }
+    Ok(getContentOfOption(message.head))
   }
   /**
     *
@@ -37,6 +41,6 @@ class UploadController @Inject()(cc: ControllerComponents) (implicit system: Act
     val encoded: Option[Map[String, Seq[String]]] = request.body.asFormUrlEncoded
     val doc1: Option[String] = for (b <- encoded; z <- b.get("document1"); s <- z.headOption ) yield s
     val doc2: Option[String] = for (b <- encoded; z <- b.get("document2"); s <- z.headOption ) yield s
-    Comparison.getDocument(doc1,doc2).map(i=>Ok(i.toString))
+    Comparison.getDocument(doc1,doc2).map(score=>Ok(score.toString))
   }
 }
