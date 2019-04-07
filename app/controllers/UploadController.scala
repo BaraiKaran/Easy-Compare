@@ -14,7 +14,6 @@ import scala.util.Success
 class UploadController @Inject()(cc: ControllerComponents) (implicit system: ActorSystem, mat: Materializer) extends AbstractController(cc) with play.api.i18n.I18nSupport {
 
 
-  def getContentOfOption[T](content: Seq[T]) = content.head
 
   /**
     * GET request to load the form.
@@ -31,7 +30,8 @@ class UploadController @Inject()(cc: ControllerComponents) (implicit system: Act
     //val formData: String = BasicForm.form.bindFromRequest.get.path
     val file = request.body.asMultipartFormData.map(_.files)
     val message: Option[Seq[String]] = file map { fileseq => fileseq map { file => preprocess.apply(file.filename) } }
-    Ok(getContentOfOption(message.head))
+    val messageString = message.fold("") { x=> x.head }
+    Ok(messageString)
   }
   /**
     *

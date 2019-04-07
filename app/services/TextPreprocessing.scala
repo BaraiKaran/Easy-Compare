@@ -17,8 +17,8 @@ object preprocess {
         val textOfDoc = convertListToString(text)
         val textWithoutSpaces = removeWhiteSpaces(textOfDoc)
         val sentences = splitText(textWithoutSpaces)
-        val hashSentences = Try(Comparison.hashContentsOfList(sentences))
-        InteractionWithDb.insert(hashSentences.get.mkString(","), getFileName(filePath))
+        val hashSentences: List[Int] = Comparison.hashContentsOfList(sentences)
+        InteractionWithDb.insert(hashSentences.mkString(","), getFileName(filePath))
         "File uploaded successfully"
       }
       else {
