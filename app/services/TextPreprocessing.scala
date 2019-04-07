@@ -18,7 +18,7 @@ object preprocess {
         val textWithoutSpaces = removeWhiteSpaces(textOfDoc)
         val sentences = splitText(textWithoutSpaces)
         val hashSentences = Try(Comparison.hashContentsOfList(sentences))
-        InteractionWithDb.insert(hashSentences.get.mkString(","), getFileName(filePath).get)
+        InteractionWithDb.insert(hashSentences.get.mkString(","), getFileName(filePath))
         "File uploaded successfully"
       }
       else {
@@ -38,7 +38,7 @@ object preprocess {
     * @param str string from which to remove whitespaces
     * @return string without any whitespaces
     */
-  def removeWhiteSpaces(str: Try[String]): Try[String] = Try(str.get.replaceAll("\\s",""))
+  def removeWhiteSpaces(str: Try[String]) = for(st <- str) yield st.replaceAll("\\s","")
 
   /**
     *
@@ -52,15 +52,16 @@ object preprocess {
     * @param filePath absolute path of the file
     * @return name of the file
     */
-  def getFileName(filePath: String) : Try[String] = {
-    Try(filePath.substring(filePath.lastIndexOf("\\")+1,filePath.length))
+  def getFileName(filePath: String) : String = {
+    filePath.substring(filePath.lastIndexOf("\\")+1,filePath.length)
   }
 
   /**
     * @param txt string to split
     * @return List of string after splitting the string by "."
     */
-  def splitText(txt : Try[String]) = Try(txt.get.split("\\.").toList)
+
+  def splitText(txt : Try[String]) = for (t<-txt) yield t.split("\\.").toList
 
   def uploadFile(path: String) = {
   }
