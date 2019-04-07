@@ -34,13 +34,13 @@ object InteractionWithDb {
     * @param sentences string of hashes of all the sentences in the document
     * @param filename name of the file
     */
-  def insert(sentences : String, filename: String) = {
-    try {
+  def insert(sentences : Try[String], filename: String) = {
+
       Await.result(db.run(DBIO.seq(
         doc.schema.createIfNotExists,
-        doc += document(None,filename,sentences),
+        doc += document(None,filename,sentences.get),
         doc.result.map(println))),Duration.Inf)
-    } finally db.close()
+        db.close()
   }
 
   /**
