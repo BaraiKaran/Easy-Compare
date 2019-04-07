@@ -15,8 +15,9 @@ object Comparison {
     * @param list list of all the sentences as individual elements
     * @return hash of each individual sentence using Murmurhash
     */
-  def hashContentsOfList(list: Try[List[String]]) = for (item <- list.get) yield MurmurHash3.stringHash(item)
-
+  def hashContentsOfList(list: Try[List[String]]) : Try[List[Int]] = {
+    for (item <- list) yield item.map(x => MurmurHash3.stringHash(x))
+  }
 
   /**
     * *
