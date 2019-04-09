@@ -17,7 +17,8 @@ libraryDependencies ++= Seq( jdbc , ehcache , ws , specs2 % Test , guice )
 libraryDependencies ++= Seq(
   "com.typesafe.slick" %% "slick" % "3.3.0",
   "org.slf4j" % "slf4j-nop" % "1.6.4",
-  "com.typesafe.slick" %% "slick-hikaricp" % "3.3.0"
+  "com.typesafe.slick" %% "slick-hikaricp" % "3.3.0",
+  "org.apache.poi" % "poi-ooxml" % "3.17"
 )
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.5"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
