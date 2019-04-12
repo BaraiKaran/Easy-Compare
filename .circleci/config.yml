@@ -1,34 +1,37 @@
-# Scala CircleCI 2.0 configuration file
 version: 2
 jobs:
   build:
-    docker:
-      - image: circleci/openjdk:8-jdk
-      
-
     working_directory: ~/Easy_Compare
-
+    docker:
+      - image: openjdk:8
     environment:
-      # Customize the JVM maximum heap limit
-      JVM_OPTS: -Xmx3200m
-      TERM: dumb
-    
+      SBT_VERSION: 1.0.4
     steps:
+      - run: echo 'export ARTIFACT_BUILD=$CIRCLE_PROJECT_REPONAME-$CIRCLE_BUILD_NUM.zip' >> $BASH_ENV
+      - run:
+          name: Get sbt binary
+          command: |
+                    apt update && apt install -y curl
+                    curl -L -o sbt-$SBT_VERSION.deb https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb
+                    dpkg -i sbt-$SBT_VERSION.deb
+                    rm sbt-$SBT_VERSION.deb
+                    apt-get update
+                    apt-get install -y sbt python-pip git
+                    pip install awscli
+                    apt-get clean && apt-get autoclean
       - checkout
-
-      # Download and cache dependencies
       - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "build.sbt" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
-
-      - run: cat /dev/null | sbt test:compile
-
+          # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
+          key: sbt-cache
+      - run:
+          name: Compile Easy_Compare dist package
+          command: cat /dev/null | sbt clean update dist
+      - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
+          path: target/universal/Easy_Compare.zip
+          destination: Easy_Compare
       - save_cache:
+          key: sbt-cache
           paths:
-            - ~/.m2
-          key: v1-dependencies--{{ checksum "build.sbt" }}
-        
-      # run tests!
-      - run: cat /dev/null | sbt "testOnly -- -l org.scalatest.tags.Slow"
+            - "~/.ivy2/cache"
+            - "~/.sbt"
+            - "~/.m2"
