@@ -5,7 +5,7 @@ import models.InteractionWithDb
 import javax.inject.Inject
 import akka.actor.ActorSystem
 import akka.stream.Materializer
-
+import play.api.Logger
 import scala.collection.immutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -16,29 +16,32 @@ class UploadController @Inject()(cc: ControllerComponents) (implicit system: Act
   /**
     * GET request to load the form.
     */
-  def forms = Action { implicit request: Request[AnyContent] =>
+  def forms: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] => Future {
     val name = InteractionWithDb.getUploadedFileNames()
-    Ok(views.html.upload(BasicForm.form,name.map(x=> (x,x))))
+    Ok(views.html.upload(BasicForm.form, name.map(x => (x, x))))
+  }
   }
 
   /**
     * POST request to upload the file and it's details in the database
     */
-  def simpleFormPost = Action { implicit request =>
-    //val formData: String = BasicForm.form.bindFromRequest.get.path
-    val file = request.body.asMultipartFormData.map(_.files)
-    val message: Option[Seq[String]] = file map { fileseq => fileseq map { file => preprocess.apply(file.filename) } }
-    val messageString = message.fold("") { x=> x.mkString}
-    Ok(messageString)
+  def simpleFormPost: Action[AnyContent] = Action.async { implicit request =>
+    Future {
+      //val formData: String = BasicForm.form.bindFromRequest.get.path
+      val file = request.body.asMultipartFormData.map(_.files)
+      val message: Option[Seq[String]] = file map { fileseq => fileseq map { file => preprocess.apply(file.filename) } }
+      val messageString = message.fold("") { x => x.mkString }
+      Ok(messageString)
+    }
   }
   /**
     *
     * @return Comparision score of two documents
     */
-  def compare  = Action.async { implicit request =>
+  def compare: Action[AnyContent] = Action.async { implicit request =>
     val encoded: Option[Map[String, Seq[String]]] = request.body.asFormUrlEncoded
     val doc1: Option[String] = for (b <- encoded; z <- b.get("document1"); s <- z.headOption ) yield s
     val doc2: Option[String] = for (b <- encoded; z <- b.get("document2"); s <- z.headOption ) yield s
-    Comparison.getDocument(doc1,doc2).map(score=>Ok(score.toString))
+    Comparison.getDocument(doc1,doc2).map(score=>Ok("plagiarism score: " + score.toString))
   }
 }

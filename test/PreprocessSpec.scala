@@ -25,9 +25,4 @@ class PreprocessSpec extends FlatSpec {
     val str = "C:\\Example\\example.txt"
     assert("example.txt" === preprocess.getFileName(str))
   }
-
-
-
-
-
 }

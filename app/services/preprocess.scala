@@ -6,37 +6,38 @@ import java.util
 
 import models.InteractionWithDb
 import org.apache.poi.xwpf.usermodel.{XWPFDocument, XWPFRun}
+import play.api.Logger
 
 import scala.collection.JavaConversions._
 import scala.util.{Failure, Success, Try}
 
 object preprocess {
-
+  val logger: Logger = Logger(this.getClass())
   /**
     * this function applies the necessary text pre-processing required for document comparision.
     * @param filePath absolute path of the file
     */
-    def apply(filePath: String)  = {
-      val total = new StringBuilder
-      if (ValidationService.getFileType(filePath)=="docx"){
-        val path = Paths.get(filePath)
-        val byteData = Files.readAllBytes(path)
-        val doc = new XWPFDocument(new ByteArrayInputStream(byteData))
-        for (para <- doc.getParagraphs) {
-           val runs =  para.getRuns
-           for(run <- runs) {
-            total.append(run.getText(-1))
-           }
+    def apply(filePath: String) : String  = {
+        val total = new StringBuilder
+        if (ValidationService.getFileType(filePath) == "docx") {
+          val path = Paths.get(filePath)
+          val byteData = Files.readAllBytes(path)
+          val doc = new XWPFDocument(new ByteArrayInputStream(byteData))
+          for (para <- doc.getParagraphs) {
+            val runs = para.getRuns
+            for (run <- runs) {
+              total.append(run.getText(-1))
+            }
+          }
+          textPreProcessAndStore(Try(total.toString()), filePath)
         }
-        textPreProcessAndStore(Try(total.toString()),filePath)
+        else if (ValidationService.getFileType(filePath) == "txt") {
+          val text: Try[List[String]] = readTextFile(filePath)
+          val textOfDoc = convertListToString(text)
+          textPreProcessAndStore(textOfDoc, filePath)
+        }
+        "File uploaded Successfully"
       }
-      else if (ValidationService.getFileType(filePath)=="txt") {
-        val text: Try[List[String]] = readTextFile(filePath)
-        val textOfDoc = convertListToString(text)
-        textPreProcessAndStore(textOfDoc,filePath)
-      }
-      "File uploaded Successfully"
-    }
   /**
     *
     * @param filePath path of the file
@@ -49,7 +50,7 @@ object preprocess {
     * @param str string from which to remove whitespaces
     * @return string without any whitespaces
     */
-  def removeWhiteSpaces(str: Try[String]) = for(st <- str) yield st.replaceAll("\\s","")
+  def removeWhiteSpaces(str: Try[String]) : Try[String] = for(st <- str) yield st.replaceAll("\\s","")
 
   /**
     *
@@ -72,12 +73,10 @@ object preprocess {
     * @return List of string after splitting the string by "."
     */
 
-  def splitText(txt : Try[String]) = for (t<-txt) yield t.split("\\.").toList
+  def splitText(txt : Try[String]) : Try[List[String]] = for (t<-txt) yield t.split("\\.").toList
 
-  def uploadFile(path: String) = {
-  }
 
-  def textPreProcessAndStore(text: Try[String],filePath: String) = {
+  def textPreProcessAndStore(text: Try[String],filePath: String) : Unit = {
     val textWithoutSpaces: Try[String] = removeWhiteSpaces(text)
     val sentences: Try[List[String]] = splitText(textWithoutSpaces)
     val hashSentences: Try[List[Int]] = Comparison.hashContentsOfList(sentences)

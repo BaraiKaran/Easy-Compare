@@ -9,7 +9,6 @@ import scala.util.hashing.MurmurHash3
 import scala.concurrent.ExecutionContext.Implicits.global
 object Comparison {
 
-
   /**
     *
     * @param list list of all the sentences as individual elements
