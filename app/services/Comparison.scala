@@ -27,7 +27,7 @@ object Comparison {
 
   def calculateSimilarityScore(list1: List[String],list2: List[String]) : Double = {
     val intersectLength =  list1.intersect(list2).length.toDouble
-    val unionLength = list1.union(list2).toSet.size.toDouble
+    val unionLength = (list1.union(list2)).toSet.size.toDouble
      "%.2f".format(intersectLength/unionLength).toDouble
   }
 
