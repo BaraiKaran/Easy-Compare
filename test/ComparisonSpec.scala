@@ -19,4 +19,9 @@ class ComparisonSpec extends FlatSpec {
     val lst2 = Comparison.hashContentsOfList(Try(List("Hello", "my", "name","is","tom")))
     assert(lst1.get == lst2.get)
   }
+
+  "getListFromOption" should "return list fro option type" in {
+    val lst = Comparison.getListFromOption(Option(List(1,2,3)))
+    assert(lst == List(1,2,3))
+  }
 }
