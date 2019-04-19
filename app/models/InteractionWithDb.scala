@@ -19,7 +19,7 @@ object InteractionWithDb {
 
   /**
     * Create a table in Postgresql if the table is not already present.
-    * @param tag
+    * @param tag A Tag marks a specific row represented by an AbstractTable instance.
     */
 
   class documents(tag: Tag) extends Table[document](tag, "tblDocumentInformation") {
@@ -34,8 +34,7 @@ object InteractionWithDb {
     * @param sentences string of hashes of all the sentences in the document
     * @param filename name of the file
     */
-  def insert(sentences : Try[String], filename: String) = {
-
+  def insert(sentences : Try[String], filename: String) : Unit = {
       Await.result(db.run(DBIO.seq(
         doc.schema.createIfNotExists,
         doc += document(None,filename,sentences.get),
@@ -43,12 +42,7 @@ object InteractionWithDb {
         db.close()
   }
 
-  /**
-    *
-    * @param filename1 name of the file 1
-    * @param filename2 name of the file 2
-    * @return tuple of list of string which contains hashed value of each sentence.
-    */
+
   def sequence[X](xfo: Option[Future[X]]): Future[Option[X]] = xfo match {
     case Some(xf) => xf map (Some(_))
     case None => Future.successful(None)
@@ -77,7 +71,7 @@ object InteractionWithDb {
     *
     * @return returns name of all the files uploaded in the database
     */
-  def getUploadedFileNames() = {
+  def getUploadedFileNames() : Seq[String] = {
     Await.result(db.run(doc.map(_.document_name).result), Duration.Inf)
   }
 }
