@@ -13,7 +13,7 @@ import scala.util.Try
 
 object InteractionWithDb {
 
-  case class document(id: Option[Int], Document_Name: String, Document_Text: String)
+  case class document(id: Option[Int], Document_Name: String, Document_Text: String, sentence_text: String)
   val db = Database.forConfig("postgresDb")
   val doc = TableQuery[documents]
 
@@ -26,7 +26,8 @@ object InteractionWithDb {
     def id = column[Int]("ID", O.PrimaryKey,O.AutoInc)
     def document_name = column[String]("Document_Name")
     def document_text = column[String]("Document_Text")
-    def * = (id.?, document_name, document_text) <> (document.tupled,document.unapply)
+    def sentence_text = column[String]("sentence_text")
+    def * = (id.?, document_name, document_text, sentence_text) <> (document.tupled,document.unapply)
   }
 
   /**
@@ -34,10 +35,10 @@ object InteractionWithDb {
     * @param sentences string of hashes of all the sentences in the document
     * @param filename name of the file
     */
-  def insert(sentences : Try[String], filename: String) : Unit = {
+  def insert(sentences : Try[String], filename: String, sentence_text: String) : Unit = {
       Await.result(db.run(DBIO.seq(
         doc.schema.createIfNotExists,
-        doc += document(None,filename,sentences.get),
+        doc += document(None,filename,sentences.get, sentence_text),
         doc.result.map(println))),Duration.Inf)
         db.close()
   }
