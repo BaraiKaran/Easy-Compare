@@ -16,6 +16,11 @@ class PreprocessSpec extends FlatSpec {
     assert(str === Success("HelloThisisaScalatest"))
   }
 
+  "removeMultipleWhiteSpaces" should "Remove multiple white spaces in a string" in {
+    val str = preprocess.removeWhiteSpaces(Try("Hello    This   is a        Scala test"))
+    assert(str === Success("HelloThisisaScalatest"))
+  }
+
   "splitText" should "Split the text and return as List" in {
     val stringToSplit = preprocess.splitText(Try("Hello.Thisisa.ScalaTest"))
     assert(stringToSplit === Success(List("Hello","Thisisa","ScalaTest")))
