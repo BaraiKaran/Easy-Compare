@@ -21,13 +21,17 @@ class ComparisonSpec extends FlatSpec with Matchers with Futures with ScalaFutur
   "hashContentsOfList" should "hash the inputted list of string using Murmur Hash 3" in {
     val lst1 = Comparison.hashContentsOfList(Try(List("Hello", "my", "name","is","tom")))
     val lst2 = Comparison.hashContentsOfList(Try(List("Hello", "my", "name","is","tom")))
-    assert(lst1.get == lst2.get)
+    val cmp1 = for(ls <- lst1) yield ls
+    val cmp2 = for (ls <- lst2) yield ls
+    assert(cmp1==cmp2)
   }
 
   "hashContentsOfListNotEqual" should "hash the inputted list of string using Murmur Hash 3" in {
     val lst1 = Comparison.hashContentsOfList(Try(List("Hello", "my", "name","is")))
     val lst2 = Comparison.hashContentsOfList(Try(List("Hello", "my", "name","is","tom")))
-    assert(lst1.get != lst2.get)
+    val cmp1 = for(ls <- lst1) yield ls
+    val cmp2 = for (ls <- lst2) yield ls
+    assert(cmp1!=cmp2)
   }
 
   "getListFromOption" should "return list fro option type" in {
