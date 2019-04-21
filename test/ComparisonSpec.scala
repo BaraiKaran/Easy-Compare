@@ -9,6 +9,7 @@ import scala.concurrent._
 
 class ComparisonSpec extends FlatSpec with Matchers with Futures with ScalaFutures {
 
+
   "calculateSimilarityScore" should "return jaccard similarity score of two documents" in {
     val list1 = List("0","1","2","5","6")
     val list2 = List("0","2","3","4","5","7","9")
@@ -18,7 +19,8 @@ class ComparisonSpec extends FlatSpec with Matchers with Futures with ScalaFutur
     assert(Comparison.calculateSimilarityScore(list3,list4) == 1.0)
   }
 
-  "hashContentsOfList" should "hash the inputted list of string using Murmur Hash 3" in {
+  "hashContentsOfList" should
+    "hash the inputted list of string using Murmur Hash 3" in {
     val lst1 = Comparison.hashContentsOfList(Try(List("Hello", "my", "name","is","tom")))
     val lst2 = Comparison.hashContentsOfList(Try(List("Hello", "my", "name","is","tom")))
     val cmp1 = for(ls <- lst1) yield ls

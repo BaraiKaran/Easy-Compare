@@ -43,12 +43,10 @@ object InteractionWithDb {
         db.close()
   }
 
-
   def sequence[X](xfo: Option[Future[X]]): Future[Option[X]] = xfo match {
     case Some(xf) => xf map (Some(_))
     case None => Future.successful(None)
   }
-
 
   def getComparison(filename1: Option[String], filename2: Option[String]): Future[Option[(List[String], List[String])]] = {
     val zipBothFiles = getZipped(filename1, filename2)
@@ -60,7 +58,6 @@ object InteractionWithDb {
     val dsof: Future[Option[Seq[document]]] = sequence(dsfo)
     for (dso <- dsof) yield for (ds <- dso; d <- ds.headOption) yield d.Document_Text.split("\\,").map(_.trim).toList
   }
-
 
   def getZipped(filename1: Option[String], filename2: Option[String]): Future[(Option[List[String]], Option[List[String]])] = {
     val content1 = getfileContents(filename1)
