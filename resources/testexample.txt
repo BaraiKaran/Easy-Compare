@@ -1,0 +1,4 @@
+You do not need to add ScalaTest to your build explicitly. 
+The proper version of ScalaTest will be brought in automatically as a transitive dependency of ScalaTest + Play. 
+You will, however, need to select a version of ScalaTest + Play that matches your Play version. 
+You can do so by checking the releases compatibility matrix for ScalaTest + Play.
