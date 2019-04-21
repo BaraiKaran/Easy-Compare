@@ -9,5 +9,5 @@ object ValidationService {
     filePath.substring(filePath.lastIndexOf(".")+1,filePath.length)
   }
 
-  def checkIfFileNameExists(filename: String) : Boolean = if (InteractionWithDb.getUploadedFileNames().contains(filename)) true else false
+  def checkIfFileNameExists(filename: String) : Boolean = InteractionWithDb.getUploadedFileNames().contains(filename)
 }
