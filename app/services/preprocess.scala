@@ -6,38 +6,44 @@ import java.util
 
 import models.InteractionWithDb
 import org.apache.poi.xwpf.usermodel.{XWPFDocument, XWPFRun}
-import play.api.Logger
-
 import scala.collection.JavaConversions._
 import scala.util.{Failure, Success, Try}
 
 object preprocess {
-  val logger: Logger = Logger(this.getClass())
   /**
     * this function applies the necessary text pre-processing required for document comparision.
     * @param filePath absolute path of the file
     */
     def apply(filePath: String) : String  = {
-        val total = new StringBuilder
-        if (ValidationService.getFileType(filePath) == "docx") {
-          val path = Paths.get(filePath)
-          val byteData = Files.readAllBytes(path)
-          val doc = new XWPFDocument(new ByteArrayInputStream(byteData))
-          for (para <- doc.getParagraphs) {
-            val runs = para.getRuns
-            for (run <- runs) {
-              total.append(run.getText(-1))
+      val total = new StringBuilder
+      ValidationService.checkIfFileNameExists(getFileName(filePath)) match {
+        case false => {
+          ValidationService.getFileType(filePath) match {
+            case "docx" => {
+              val path = Paths.get(filePath)
+              val byteData = Files.readAllBytes(path)
+              val doc = new XWPFDocument(new ByteArrayInputStream(byteData))
+              for (para <- doc.getParagraphs) {
+                val runs = para.getRuns
+                for (run <- runs) {
+                  total.append(run.getText(-1))
+                }
+              }
+              textPreProcessAndStore(Try(total.toString()), filePath)
+              "File Uploaded Successfully."
             }
+            case "txt" => {
+              val text: Try[List[String]] = readTextFile(filePath)
+              val textOfDoc = convertListToString(text)
+              textPreProcessAndStore(textOfDoc, filePath)
+              "File Uploaded Successfully."
+            }
+            case _ => "Unsupported file type."
           }
-          textPreProcessAndStore(Try(total.toString()), filePath)
         }
-        else if (ValidationService.getFileType(filePath) == "txt") {
-          val text: Try[List[String]] = readTextFile(filePath)
-          val textOfDoc = convertListToString(text)
-          textPreProcessAndStore(textOfDoc, filePath)
-        }
-        "File uploaded Successfully"
+        case true => "File name already exists"
       }
+    }
   /**
     *
     * @param filePath path of the file
