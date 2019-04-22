@@ -15,4 +15,10 @@ class InteractionWithDbSpec extends FlatSpec with Matchers with Futures with Sca
     val lstf: Future[Option[List[Int]]] = InteractionWithDb.sequence(Option(Future(List(1,2,3))))
     whenReady(lstf) {i=> assert(i==Await.result(Future(Option(List(1,2,3))),Duration.Inf))}
   }
+
+  "SequenceWhenGivenNull" should "return Future[Option[X]]" in {
+    val lstf = InteractionWithDb.sequence(Option(Future(None)))
+    whenReady(lstf) {i=> assert(i==Await.result(Future(Option(None)),Duration.Inf))}
+  }
+
 }

@@ -40,8 +40,8 @@ class UploadController @Inject()(cc: ControllerComponents) extends AbstractContr
     */
   def compare: Action[AnyContent] = Action.async { implicit request =>
     val encoded: Option[Map[String, Seq[String]]] = request.body.asFormUrlEncoded
-    val doc1: Option[String] = for (b <- encoded; z <- b.get("document1"); s <- z.headOption ) yield s
-    val doc2: Option[String] = for (b <- encoded; z <- b.get("document2"); s <- z.headOption ) yield s
+    val doc1: Option[String] = for (b <- encoded; z <- b.get("Document1"); s <- z.headOption ) yield s
+    val doc2: Option[String] = for (b <- encoded; z <- b.get("Document2"); s <- z.headOption ) yield s
     Comparison.getDocument(doc1,doc2).map(score=>Ok("plagiarism score: " + score.toString))
   }
 }

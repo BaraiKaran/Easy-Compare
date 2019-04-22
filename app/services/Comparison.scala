@@ -1,13 +1,14 @@
 package services
 
 import models.InteractionWithDb
-
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.util.{Success, Try}
 import scala.util.hashing.MurmurHash3
 import scala.concurrent.ExecutionContext.Implicits.global
 object Comparison {
+
+  implicit def strToDouble(str: String) : Double =  augmentString(str).toDouble
 
   /**
     *
@@ -28,7 +29,7 @@ object Comparison {
   def calculateSimilarityScore(list1: List[String],list2: List[String]) : Double = {
     val intersectLength =  list1.intersect(list2).length.toDouble
     val unionLength = (list1.union(list2)).toSet.size.toDouble
-     "%.2f".format(intersectLength/unionLength).toDouble
+    "%.2f".format(intersectLength/unionLength)
   }
 
   /**

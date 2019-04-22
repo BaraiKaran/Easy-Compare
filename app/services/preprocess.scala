@@ -87,6 +87,9 @@ object preprocess {
     val sentences: Try[List[String]] = splitText(textWithoutSpaces)
     val hashSentences: Try[List[Int]] = Comparison.hashContentsOfList(sentences)
     val hashSentencesStr =  for(hs <- hashSentences) yield hs.mkString(",")
-    InteractionWithDb.insert(hashSentencesStr, getFileName(filePath), sentences.get.mkString("-"))
+    val txt = sentences match {
+      case Success(x) => x
+    }
+    InteractionWithDb.insert(hashSentencesStr, getFileName(filePath), txt.mkString("-"))
   }
 }
