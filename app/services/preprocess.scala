@@ -82,6 +82,11 @@ object preprocess {
   def splitText(txt : Try[String]) : Try[List[String]] = for (t<-txt) yield t.split("\\.").toList
 
 
+  /**
+    *
+    * @param text Entire text of the file
+    * @param filePath Absolute path that user selects from file explorer while uploading the file
+    */
   def textPreProcessAndStore(text: Try[String],filePath: String) : Unit = {
     val textWithoutSpaces: Try[String] = removeWhiteSpaces(text)
     val sentences: Try[List[String]] = splitText(textWithoutSpaces)

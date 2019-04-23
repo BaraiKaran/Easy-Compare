@@ -45,9 +45,25 @@ object Comparison {
     getSimilarityScore(fname1,fname2)
   }
 
+  /**
+    *
+    * @param lst List to convert to Future[List[T]]
+    */
   def flattenFuture[T](lst: Future[Option[List[T]]]) : Future[List[T]] = lst.map(x=> getListFromOption(x))
 
+  /**
+    *
+    * @param to Get List[T] from Option[List[T]]
+    * @return List[T]
+    */
   def getListFromOption[T](to: Option[List[T]]): List[T] = to.toList.flatten
 
+
+  /**
+    *
+    * @param list1 List to compare
+    * @param list2 List to compare
+    * @return Similarity score
+    */
   def getSimilarityScore(list1: Future[Option[List[String]]], list2: Future[Option[List[String]]]) : Future[Double] = for(ws1<-flattenFuture(list1);ws2<-flattenFuture(list2)) yield calculateSimilarityScore(ws1,ws2)
 }
