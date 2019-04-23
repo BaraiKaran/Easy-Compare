@@ -53,12 +53,24 @@ object InteractionWithDb {
     for ((wso1, wso2) <- zipBothFiles) yield for (ws1 <- wso1; ws2 <- wso2) yield (ws1, ws2)
   }
 
+  /**
+    *
+    * @param filename name of file for which you want the contents.
+    * @return List of string separated by "," with hashed contents of a file.
+    */
+
   def getfileContents(filename: Option[String]): Future[Option[List[String]]] = {
     val dsfo: Option[Future[Seq[document]]] = for (f <- filename) yield db.run(doc.filter(_.document_name === f).result)
     val dsof: Future[Option[Seq[document]]] = sequence(dsfo)
     for (dso <- dsof) yield for (ds <- dso; d <- ds.headOption) yield d.Document_Text.split("\\,").map(_.trim).toList
   }
 
+  /**
+    *
+    * @param filename1 Name of the file to be compared
+    * @param filename2 Name of the file to be compared
+    * @return Zipped list of string containing hash of each sentences
+    */
   def getZipped(filename1: Option[String], filename2: Option[String]): Future[(Option[List[String]], Option[List[String]])] = {
     val content1 = getfileContents(filename1)
     val content2 = getfileContents(filename2)

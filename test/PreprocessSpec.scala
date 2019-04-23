@@ -37,4 +37,8 @@ class PreprocessSpec extends FlatSpec {
     }
     assert(lststr == List("you do not need to add scalatest to your build explicitly. ", "the proper version of scalatest will be brought in automatically as a transitive dependency of scalatest + play. ", "you will, however, need to select a version of scalatest + play that matches your play version. ", "you can do so by checking the releases compatibility matrix for scalatest + play."))
   }
+
+  "apply" should "return appropriate message when user uploads unsupported file format" in {
+    assert(preprocess.apply("C:\\Example\\example.png") == "Unsupported file type.")
+  }
 }
