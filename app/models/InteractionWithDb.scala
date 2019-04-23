@@ -36,11 +36,11 @@ object InteractionWithDb {
     * @param filename name of the file
     */
   def insert(sentences : Try[String], filename: String, sentencetext: String) : Unit = {
-      Await.result(db.run(DBIO.seq(
+       Await.result(db.run(DBIO.seq(
         doc.schema.createIfNotExists,
         doc += document(None,filename,sentences.get, sentencetext),
         doc.result.map(println))),Duration.Inf)
-        db.close()
+
   }
 
   def sequence[X](xfo: Option[Future[X]]): Future[Option[X]] = xfo match {
