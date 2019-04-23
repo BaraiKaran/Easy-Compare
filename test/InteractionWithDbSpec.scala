@@ -20,5 +20,4 @@ class InteractionWithDbSpec extends FlatSpec with Matchers with Futures with Sca
     val lstf = InteractionWithDb.sequence(Option(Future(None)))
     whenReady(lstf) {i=> assert(i==Await.result(Future(Option(None)),Duration.Inf))}
   }
-
 }

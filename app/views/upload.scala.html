@@ -37,16 +37,32 @@
         </header>
         <div class="header-fixed-placeholder"></div>
         <br/>
+        <br/>
+        <br/>
+        <div class="main-content" style="width: 500px; margin: 0 auto; border: 1px solid black;">
+        <br/>
+        <div style="width: 500px; margin-left: 15%">
+        <label><b>Upload File:</b></label>
+        <br/>
+        <br/>
         @helper.form(action =routes.UploadController.simpleFormPost(), 'enctype->"multipart/form-data"){
-            @inputFile(userForm("path"), 'multiple -> "multiple", 'name->"path[]")
+            @inputFile(userForm("Path"), 'multiple -> "multiple", 'name->"path[]")
+            <br/>
             <input type="submit" value="Submit">
         }
         <br/>
+        <label><b>Compare Files:</b></label>
+            <br/>
         @helper.form(action = routes.UploadController.compare()) {
             @select(field = userForm("Document1"), options = listOfName)
+            <br/>
             @select(field = userForm("Document2"), options = listOfName)
+            <br/>
             <input type="submit" value="compare">
         }
+        </div>
+        <br/>
+        </div>
 
         <link rel="stylesheet" media="screen" href="/stylesheets/upload.css">
 
