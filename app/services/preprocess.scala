@@ -6,43 +6,51 @@ import java.util
 
 import models.InteractionWithDb
 import org.apache.poi.xwpf.usermodel.{XWPFDocument, XWPFRun}
+import org.slf4j.LoggerFactory
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.collection.JavaConversions._
+import scala.collection.immutable
+import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
 object preprocess {
   /**
     * this function applies the necessary text pre-processing required for document comparision.
+    *
+    * // CONSIDER make this the apply method of a trait or class, not an object.
+    *
     * @param filePath absolute path of the file
     */
-    def apply(filePath: String) : String  = {
+    def apply(filePath: String) : Future[String]  = {
       val total = new StringBuilder
-      ValidationService.checkIfFileNameExists(getFileName(filePath)) match {
-        case false => {
-          ValidationService.getFileType(filePath) match {
-            case "docx" => {
-              val path = Paths.get(filePath)
-              val byteData = Files.readAllBytes(path)
-              val doc = new XWPFDocument(new ByteArrayInputStream(byteData))
-              for (para <- doc.getParagraphs) {
-                val runs = para.getRuns
-                for (run <- runs) {
-                  total.append(run.getText(-1))
-                }
+      val bf = ValidationService.checkIfFileNameExists(getFileName(filePath))
+      bf.map (b => if (b) "File name already exists" else
+      {
+        ValidationService.getFileType(filePath) match {
+          case "docx" => {
+            val path = Paths.get(filePath)
+            val byteData = Files.readAllBytes(path)
+            val doc = new XWPFDocument(new ByteArrayInputStream(byteData))
+            for (para <- doc.getParagraphs) {
+              val runs = para.getRuns
+              for (run <- runs) {
+                total.append(run.getText(-1))
               }
-              textPreProcessAndStore(Try(total.toString()), filePath)
-              "File Uploaded Successfully."
             }
-            case "txt" => {
-              val text: Try[List[String]] = readTextFile(filePath)
-              val textOfDoc = convertListToString(text)
-              textPreProcessAndStore(textOfDoc, filePath)
-              "File Uploaded Successfully."
-            }
-            case _ => "Unsupported file type."
+            textPreProcessAndStore(Try(total.toString()), filePath)
+            "File Uploaded Successfully."
           }
+          case "txt" => {
+            val text: Try[List[String]] = readTextFile(filePath)
+            val textOfDoc = convertListToString(text)
+            textPreProcessAndStore(textOfDoc, filePath)
+            "File Uploaded Successfully."
+          }
+          case _ => "Unsupported file type."
         }
-        case true => "File name already exists"
       }
+      )
     }
   /**
     *
@@ -94,7 +102,10 @@ object preprocess {
     val hashSentencesStr =  for(hs <- hashSentences) yield hs.mkString(",")
     val txt = sentences match {
       case Success(x) => x
+      case Failure(exception) => logger.error(s"textPreProcessAndStore: threw exception", exception); Nil
     }
     InteractionWithDb.insert(hashSentencesStr, getFileName(filePath), txt.mkString("-"))
   }
+
+  val logger = LoggerFactory.getLogger(getClass)
 }

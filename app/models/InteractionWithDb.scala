@@ -2,6 +2,7 @@ package models
 
 import akka.actor.Status.Success
 import javax.xml.datatype.DatatypeConstants
+import org.slf4j.{Logger, LoggerFactory}
 import slick.lifted.Tag
 import slick.jdbc.PostgresProfile.api._
 
@@ -35,12 +36,16 @@ object InteractionWithDb {
     * @param sentences string of hashes of all the sentences in the document
     * @param filename name of the file
     */
-  def insert(sentences : Try[String], filename: String, sentencetext: String) : Unit = {
-       Await.result(db.run(DBIO.seq(
-        doc.schema.createIfNotExists,
-        doc += document(None,filename,sentences.get, sentencetext),
-        doc.result.map(println))),Duration.Inf)
-
+  def insert(sentences : Try[String], filename: String, sentencetext: String) : Future[Unit] = {
+    val eventualUnit: Future[Unit] = db.run(DBIO.seq(
+      doc.schema.createIfNotExists,
+      doc += document(None, filename, sentences.get, sentencetext),
+      doc.result.map(println)))
+    eventualUnit.recoverWith {
+      case x =>
+        logger.error("db error", x)
+        Future(())
+    }
   }
 
   def sequence[X](xfo: Option[Future[X]]): Future[Option[X]] = xfo match {
@@ -81,7 +86,7 @@ object InteractionWithDb {
     *
     * @return returns name of all the files uploaded in the database
     */
-  def getUploadedFileNames() : Seq[String] = {
-    Await.result(db.run(doc.map(_.document_name).result), Duration.Inf)
-  }
+  def getUploadedFileNames : Future[Seq[String]] = db.run(doc.map(_.document_name).result)
+
+  val logger: Logger = LoggerFactory.getLogger("application")
 }
