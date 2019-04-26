@@ -17,9 +17,6 @@ import scala.util.{Failure, Success, Try}
 object preprocess {
   /**
     * this function applies the necessary text pre-processing required for document comparision.
-    *
-    * // CONSIDER make this the apply method of a trait or class, not an object.
-    *
     * @param filePath absolute path of the file
     */
     def apply(filePath: String) : Future[String]  = {

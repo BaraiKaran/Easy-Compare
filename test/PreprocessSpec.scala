@@ -1,6 +1,8 @@
 import org.scalatest._
 import services.preprocess
 
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success, Try}
 
 class PreprocessSpec extends FlatSpec {
@@ -20,7 +22,7 @@ class PreprocessSpec extends FlatSpec {
     assert(str === Success("HelloThisisaScalatest"))
   }
 
-  "splitText" should "Split the text and return as List" in {
+      "splitText" should "Split the text and return as List" in {
     val stringToSplit = preprocess.splitText(Try("Hello.Thisisa.ScalaTest"))
     assert(stringToSplit === Success(List("Hello", "Thisisa", "ScalaTest")))
   }
@@ -30,15 +32,11 @@ class PreprocessSpec extends FlatSpec {
     assert("example.txt" === preprocess.getFileName(str))
   }
 
-  "readTextFile" should "read the file text and return lowercase list of string" in {
+    "readTextFile" should "read the file text and return lowercase list of string" in {
     val filetext: Try[List[String]] = preprocess.readTextFile("resources/testexample.txt")
     val lststr = filetext match {
       case Success(x) => x
     }
     assert(lststr == List("you do not need to add scalatest to your build explicitly. ", "the proper version of scalatest will be brought in automatically as a transitive dependency of scalatest + play. ", "you will, however, need to select a version of scalatest + play that matches your play version. ", "you can do so by checking the releases compatibility matrix for scalatest + play."))
-  }
-
-  "apply" should "return appropriate message when user uploads unsupported file format" in {
-    assert(preprocess.apply("C:\\Example\\example.png") == "Unsupported file type.")
   }
 }

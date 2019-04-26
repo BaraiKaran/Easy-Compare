@@ -3,7 +3,7 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-GET     /simpleForm                 controllers.UploadController.forms
+GET     /                           controllers.UploadController.forms
 
 POST    /simpleForm                 controllers.UploadController.simpleFormPost
 
