@@ -1,4 +1,6 @@
 package controllers
+import java.nio.file.Paths
+
 import play.api.mvc._
 import services.{BasicForm, Comparison, preprocess}
 import models.InteractionWithDb
@@ -36,27 +38,31 @@ abstract class BaseUploadController @Inject()(cc: ControllerComponents) extends 
   /**
     * POST request to upload the file and it's details in the database
     */
+
+
   def simpleFormPost: Action[AnyContent] = Action.async { implicit request =>
      {
-      //val formData: String = BasicForm.form.bindFromRequest.get.path
-      val wso = request.body.asMultipartFormData.map(_.files)
-      val wfso = wso map { fileseq => fileseq map { file => preprocess.apply(file.filename) } }
-      val wsfo = for (wfs <- wfso) yield Future.sequence(wfs)
-      val wsof = InteractionWithDb.sequence(wsfo).recover{ case x: Throwable => UploadController.logger.error("cannot get upload filename", x); None}
-      val wf = for (wso <- wsof) yield wfso.fold("") { x => x.mkString }
-      for (w <- wf) yield Ok(w)
+       val wso = request.body.asMultipartFormData.map(_.files)
+       val wfso = wso map { fileseq => fileseq map { file => preprocess.apply(file.filename) } }
+       val wsfo = for (wfs <- wfso) yield Future.sequence(wfs)
+       val wsof = InteractionWithDb.sequence(wsfo).recover{ case x: Throwable => UploadController.logger.error("cannot get upload filename", x); None}
+       val wf = for (wso <- wsof) yield wfso.fold("") { x => x.mkString }
+       for (w <- wf) yield Ok(w)
     }
   }
+
   /**
     *
     * @return Comparision score of two documents
     */
-  def compare: Action[AnyContent] = Action.async { implicit request =>
-    val encoded: Option[Map[String, Seq[String]]] = request.body.asFormUrlEncoded
-    val doc1: Option[String] = for (b <- encoded; z <- b.get("Document1"); s <- z.headOption ) yield s
-    val doc2: Option[String] = for (b <- encoded; z <- b.get("Document2"); s <- z.headOption ) yield s
-    Comparison.getDocument(doc1,doc2).map(score=>Ok("plagiarism score: " + score.toString))
-  }
+  def compare: Action[AnyContent] = Action.async {
+      implicit request =>
+        val encoded: Option[Map[String, Seq[String]]] = request.body.asFormUrlEncoded
+        val doc1: Option[String] = for (b <- encoded; z <- b.get("Document1"); s <- z.headOption) yield s
+        val doc2: Option[String] = for (b <- encoded; z <- b.get("Document2"); s <- z.headOption) yield s
+        Comparison.getDocument(doc1, doc2).map(score => Ok("plagiarism score: " + score.toString))
+      }
+
 }
 
 object UploadController {

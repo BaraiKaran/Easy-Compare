@@ -15,7 +15,7 @@ class ErrorHandler extends HttpErrorHandler {
 
   def onServerError(request: RequestHeader, exception: Throwable): Future[Result] = {
     Future.successful(
-      InternalServerError("A server error occurred: " + exception.getMessage)
+      InternalServerError("A server error occurred: " + exception.getLocalizedMessage)
     )
   }
 }

@@ -24,7 +24,6 @@ libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.5"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 libraryDependencies += "postgresql" % "postgresql" % "9.4.1208-jdbc42-atlassian-hosted"
 libraryDependencies += "org.scalamock" %% "scalamock" % "4.1.0" % Test
-
 unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )
 
       
